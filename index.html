@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>INUKA Chat - WhatsApp Style</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <aside class="sidebar">
+      <header class="sidebar-header">INUKA</header>
+      <div class="contact-list">
+        <div class="contact">
+          <img src="image/image4.jpg" alt="User 1" />
+          <div class="contact-info">
+            <h4>Mon amour</h4>
+            <p>Je t'aime</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="chat-area">
+      <header class="chat-header">
+        <img src="https://via.placeholder.com/50" alt="contact" />
+        <div class="chat-contact-info">
+          <h4>mon amour</h4>
+          <span class="status offline"></span>
+        </div>
+      </header>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="message sent">Salut, comment ça va ? 😊</div>
+        <div class="message received">Bien et toi ? 😄</div>
+      </div>
+
+      <footer class="chat-input">
+        <button id="emoji-btn" title="Ajouter un emoji">😊</button>
+        <input
+          type="text"
+          id="message-input"
+          placeholder="Écrire un message"
+          autocomplete="off"
+        />
+        <button id="send-button">Envoyer</button>
+
+        <div id="emoji-picker" class="emoji-picker hidden">
+          <span class="emoji">😀</span>
+          <span class="emoji">😂</span>
+          <span class="emoji">😍</span>
+          <span class="emoji">👍</span>
+          <span class="emoji">🙏</span>
+          <span class="emoji">😢</span>
+          <span class="emoji">🎉</span>
+          <span class="emoji">❤️</span>
+          <span class="emoji">😎</span>
+          <span class="emoji">🔥</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // === VARIABLES COMMUNES ===
+    const emojiBtn = document.getElementById('emoji-btn');
+    const emojiPicker = document.getElementById('emoji-picker');
+    const messageInput = document.getElementById('message-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const sendButton = document.getElementById('send-button');
+
+    emojiBtn.addEventListener('click', () => {
+      emojiPicker.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.emoji').forEach(emoji => {
+      emoji.addEventListener('click', () => {
+        messageInput.value += emoji.textContent;
+        emojiPicker.classList.add('hidden');
+        messageInput.focus();
+      });
+    });
+
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addMessage(content, type, viewOnce = false) {
+      const div = document.createElement('div');
+      div.className = `message ${type}`;
+
+      if (typeof content === 'string') {
+        div.textContent = content;
+      } else if (content instanceof HTMLElement) {
+        div.appendChild(content);
+
+        if (viewOnce) {
+          const overlay = document.createElement('div');
+          overlay.textContent = "👁️ Vue unique - Cliquez pour voir";
+          overlay.style.textAlign = "center";
+          overlay.style.cursor = "pointer";
+          overlay.style.padding = "5px";
+          overlay.style.color = "white";
+          overlay.style.backgroundColor = "rgba(0,0,0,0.6)";
+          overlay.style.borderRadius = "10px";
+          overlay.style.marginTop = "5px";
+
+          overlay.addEventListener('click', () => {
+            overlay.remove();
+            setTimeout(() => div.remove(), 3000); // Supprime après lecture
+          });
+
+          div.appendChild(overlay);
+        }
+      }
+
+      chatMessages.appendChild(div);
+      scrollToBottom();
+    }
+
+    sendButton.addEventListener('click', () => {
+      const text = messageInput.value.trim();
+      if (text !== "") {
+        addMessage(text, 'sent');
+        messageInput.value = "";
+      }
+    });
+
+    // === ENVOI IMAGE / VIDEO (AVEC VUE UNIQUE) ===
+    const chatInputFooter = document.querySelector('.chat-input');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*,video/*';
+    fileInput.style.display = 'none';
+
+    const fileButton = document.createElement('button');
+    fileButton.innerHTML = '📎';
+    fileButton.title = "Envoyer une image/vidéo (vue unique)";
+    fileButton.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const fileURL = URL.createObjectURL(file);
+      let mediaElement;
+
+      if (file.type.startsWith("image/")) {
+        mediaElement = document.createElement('img');
+        mediaElement.src = fileURL;
+        mediaElement.style.maxWidth = "200px";
+        mediaElement.style.borderRadius = "10px";
+      } else if (file.type.startsWith("video/")) {
+        mediaElement = document.createElement('video');
+        mediaElement.src = fileURL;
+        mediaElement.controls = true;
+        mediaElement.style.maxWidth = "200px";
+        mediaElement.style.borderRadius = "10px";
+      }
+
+      if (mediaElement) {
+        const viewOnce = confirm("Envoyer en vue unique ?");
+        addMessage(mediaElement, 'sent', viewOnce);
+      }
+
+      fileInput.value = "";
+    });
+
+    chatInputFooter.insertBefore(fileButton, messageInput);
+    chatInputFooter.appendChild(fileInput);
+
+    // === ENREGISTREMENT VOCAL ===
+    const micButton = document.createElement('button');
+    micButton.innerHTML = '🎤';
+    micButton.title = "Enregistrer un message vocal";
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    micButton.addEventListener('click', () => {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          micButton.textContent = '🔴';
+          micButton.disabled = true;
+          audioChunks = [];
+          mediaRecorder = new MediaRecorder(stream);
+
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const audioURL = URL.createObjectURL(audioBlob);
+            const audio = document.createElement('audio');
+            audio.src = audioURL;
+            audio.controls = true;
+            audio.style.maxWidth = '200px';
+            addMessage(audio, 'sent');
+
+            micButton.textContent = '🎤';
+            micButton.disabled = false;
+          };
+
+          mediaRecorder.start();
+          setTimeout(() => {
+            mediaRecorder.stop();
+            stream.getTracks().forEach(track => track.stop());
+          }, 5000); // Enregistrement 5 secondes
+        })
+        .catch(err => alert("Micro non autorisé"));
+    });
+
+    chatInputFooter.insertBefore(micButton, messageInput);
+
+    // === SIMULATION APPEL VOCAL/VIDÉO ===
+    const callButton = document.createElement('button');
+    callButton.innerHTML = '📞';
+    callButton.title = "Simuler un appel vocal/vidéo";
+
+    callButton.addEventListener('click', () => {
+      const type = prompt("Appel 'audio' ou 'video' ?");
+      if (!type || !['audio', 'video'].includes(type)) return;
+
+      const callWindow = document.createElement('div');
+      callWindow.style.position = 'fixed';
+      callWindow.style.top = '20%';
+      callWindow.style.left = '30%';
+      callWindow.style.width = '300px';
+      callWindow.style.height = '200px';
+      callWindow.style.background = '#333';
+      callWindow.style.color = '#fff';
+      callWindow.style.padding = '20px';
+      callWindow.style.borderRadius = '20px';
+      callWindow.style.zIndex = '999';
+      callWindow.innerHTML = `
+        <h3>📞 Appel ${type}</h3>
+        <p>Connexion...</p>
+        <button id="end-call">Terminer</button>
+      `;
+
+      document.body.appendChild(callWindow);
+
+      document.getElementById('end-call').addEventListener('click', () => {
+        callWindow.remove();
+      });
+    });
+
+    chatInputFooter.appendChild(callButton);
+  </script>
+</body>
+</html>
+
+

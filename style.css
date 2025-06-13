@@ -1,0 +1,244 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f2f5;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-container {
+  display: flex;
+  width: 95%;
+  height: 90vh;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* === SIDEBAR (LISTE DES CONTACTS) === */
+.sidebar {
+  width: 30%;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  background-color: #075e54;
+  color: white;
+  padding: 1rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.contact-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.contact:hover {
+  background-color: #f5f5f5;
+}
+
+.contact img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.contact-info h4 {
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+/* === CHAT AREA === */
+.chat-area {
+  width: 70%;
+  background-color: #e5ddd5;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.chat-header {
+  background-color: #ededed;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.chat-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.chat-contact-info h4 {
+  margin: 0;
+}
+
+.status {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: green;
+  margin-left: 5px;
+}
+
+.status.offline {
+  background-color: red;
+}
+
+/* === MESSAGES === */
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.sent {
+  background-color: #dcf8c6;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
+}
+
+.received {
+  background-color: #fff;
+  align-self: flex-start;
+  border-bottom-left-radius: 0;
+}
+
+/* === INPUT === */
+.chat-input {
+  background-color: #f0f0f0;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.chat-input input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.chat-input button {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.chat-input button:hover {
+  transform: scale(1.2);
+}
+
+/* === EMOJI PICKER === */
+.emoji-picker {
+  position: absolute;
+  bottom: 60px;
+  left: 50px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.emoji {
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+/* === MÉDIA (IMAGES / VIDÉOS / AUDIO) === */
+.message img,
+.message video,
+.message audio {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+
+/* === BOUTONS MODAUX (APPEL) === */
+.chat-call-window {
+  position: fixed;
+  top: 20%;
+  left: 30%;
+  width: 300px;
+  height: 200px;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-call-window button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.chat-call-window button:hover {
+  background-color: #e60000;
+}
+
+
+
